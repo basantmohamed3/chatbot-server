@@ -8,7 +8,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Voiceflow runtime API endpoint
 const VF_ENDPOINT = "https://general-runtime.voiceflow.com/state";
 
 app.post("/chat", async (req, res) => {
@@ -18,21 +17,20 @@ app.post("/chat", async (req, res) => {
     const response = await fetch(`${VF_ENDPOINT}/${userId}/interact`, {
       method: "POST",
       headers: {
-        Authorization: process.env.VOICEFLOW_API_KEY, // stored safely in .env
+        Authorization: process.env.VOICEFLOW_API_KEY,
+        versionID: "production",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        request: {
-          type: "text",
-          payload: message,
-        },
+        type: "text",
+        payload: message,
       }),
     });
 
     const data = await response.json();
     res.json(data);
   } catch (err) {
-    console.error(err);
+    console.error("Error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
