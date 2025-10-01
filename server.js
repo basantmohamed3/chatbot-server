@@ -10,10 +10,9 @@ app.use(express.json());
 
 const VF_ENDPOINT = "https://general-runtime.voiceflow.com/state";
 
-app.post("/chat", async (req, res) => {
+app.post("/chat/launch", async (req, res) => {
+  const { userId } = req.body;
   try {
-    const { message, userId } = req.body;
-
     const response = await fetch(`${VF_ENDPOINT}/user/${userId}/interact`, {
       method: "POST",
       headers: {
@@ -22,18 +21,38 @@ app.post("/chat", async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        type: "text",
-        payload: message,
+        action: { type: "launch" },
       }),
     });
-
     const data = await response.json();
     res.json(data);
   } catch (err) {
-    console.error("Error:", err);
-    res.status(500).json({ error: "Server error" });
+    console.error(err);
+    res.status(500).json({ error: "Launch failed" });
   }
 });
 
+
+app.post("/chat/text", async (req, res) => {
+  const { userId, message } = req.body;
+  try {
+    const response = await fetch(`${VF_ENDPOINT}/user/${userId}/interact`, {
+      method: "POST",
+      headers: {
+        Authorization: process.env.VOICEFLOW_API_KEY,
+        versionID: "production",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: { type: "text", payload: message },
+      }),
+    });
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Message failed" });
+  }
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
