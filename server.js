@@ -13,8 +13,8 @@ const VF_ENDPOINT = "https://general-runtime.voiceflow.com/state";
 app.post("/chat", async (req, res) => {
   try {
     const { message, userId } = req.body;
-
-    const response = await fetch(`${VF_ENDPOINT}/${userId}/interact`, {
+console.log(VF_ENDPOINT)
+    const response = await fetch(`${VF_ENDPOINT}/user/${userId}/interact`, {
       method: "POST",
       headers: {
         Authorization: process.env.VOICEFLOW_API_KEY,
